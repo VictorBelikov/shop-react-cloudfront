@@ -1,34 +1,34 @@
-service: v1ctor-cloudx-frontend
+service: shop-react-cloudfront
 
 frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs16.x
-  region: eu-west-1
+  region: us-east-1
   # setup profile for AWS CLI.
-  # profile: node-aws
+  profile: cloudx
 
 plugins:
   - serverless-finch
-  # 'serverless-single-page-app-plugin' is a custom plugin that located .serverless_plugins folder.
-  # Existing plugin (https://www.npmjs.com/package/serverless-single-page-app-plugin) doesn't have invalidate cache feature that often used during CI/CD events.
+  # Custom plugin. The original one (https://www.npmjs.com/package/serverless-single-page-app-plugin) doesn't have invalidate cache feature
   # How to build your own plugins: https://www.serverless.com/framework/docs/providers/aws/guide/plugins#service-local-plugin
   - serverless-single-page-app-plugin
   - serverless-s3-cleaner
 
 custom:
   client:
-    bucketName: my-store-app
+    bucketName: shop-react-cloudfront-app
     distributionFolder: dist
-  s3BucketName: ${self:custom.client.bucketName}
-
   ## Serverless-single-page-app-plugin configuration:
   s3LocalPath: ${self:custom.client.distributionFolder}/
+  s3BucketName: ${self:custom.client.bucketName}
+
   serverless-s3-cleaner:
     buckets:
       - ${self:custom.client.bucketName}
 
+# CloudFormation resources
 resources:
   Resources:
     ## Specifying the S3 Bucket
@@ -41,9 +41,9 @@ resources:
           IndexDocument: index.html
           ErrorDocument: index.html
         # VersioningConfiguration:
-        #   Status: Enabled
+          # Status: Enabled
 
-    ## Specifying the policies to make sure all files inside the Bucket are avaialble to CloudFront
+    ## Specifying the policies to make sure all files inside the Bucket are available to CloudFront
     WebAppS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -91,7 +91,7 @@ resources:
           # Aliases:
           # - mysite.example.com
           DefaultRootObject: index.html
-          ## Since the Single Page App is taking care of the routing we need to make sure ever path is served with index.html
+          ## Since the Single Page App is taking care of the routing we need to make sure every path is served with index.html
           ## The only exception are files that actually exist e.h. app.js, reset.css
           CustomErrorResponses:
             - ErrorCode: 404
