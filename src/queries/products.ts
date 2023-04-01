@@ -6,7 +6,7 @@ import React from 'react';
 
 export function useAvailableProducts() {
   return useQuery<AvailableProduct[], AxiosError>('available-products', async () => {
-    const res = await axios.get<AvailableProduct[]>(`${API_PATHS.bff}/product/available`);
+    const res = await axios.get<AvailableProduct[]>(`${API_PATHS.bff}/products`);
     return res.data;
   });
 }
@@ -20,7 +20,7 @@ export function useAvailableProduct(id?: string) {
   return useQuery<AvailableProduct, AxiosError>(
     ['product', { id }],
     async () => {
-      const res = await axios.get<AvailableProduct>(`${API_PATHS.bff}/product/${id}`);
+      const res = await axios.get<AvailableProduct>(`${API_PATHS.bff}/products/${id}`);
       return res.data;
     },
     { enabled: !!id },
