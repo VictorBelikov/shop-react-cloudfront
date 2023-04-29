@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { createRoot } from 'react-dom/client';
 import App from '~/components/App/App';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -7,6 +8,24 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { theme } from '~/theme';
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { status } = error.response;
+    if (status === 401) {
+      alert(`Error: status: ${status}. Authorization header is not provided!`);
+    }
+    if (status === 403) {
+      alert(`Error: status: ${status}. Invalid token!`);
+    }
+    return Promise.reject(error.response);
+  },
+);
+
+if (!localStorage.getItem('authorization_token')) {
+  localStorage.setItem('authorization_token', 'VmljdG9yQmVsaWtvdjpURVNUX1BBU1NXT1JE');
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
